@@ -39,8 +39,8 @@ export function FocusTimerProvider({
 }) {
   const router = useRouter();
   const [selectedPresetId, setSelectedPresetId] = useState<string>(focusPresets[0].id);
-  const [sessionMinutes, setSessionMinutes] = useState(focusPresets[0].minutes);
-  const [remainingSeconds, setRemainingSeconds] = useState(focusPresets[0].minutes * 60);
+  const [sessionMinutes, setSessionMinutes] = useState<number>(focusPresets[0].minutes);
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(focusPresets[0].minutes * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
