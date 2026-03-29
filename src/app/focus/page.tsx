@@ -14,12 +14,15 @@ import { format } from "date-fns";
 import { addGoal, toggleGoalStatus } from "@/app/actions";
 import { AuthPanel } from "@/components/auth-panel";
 import { FocusTimer } from "@/components/focus-timer";
+import { LiveNow } from "@/components/live-now";
 import { SubmitButton } from "@/components/submit-button";
 import { SignOutButton } from "@/components/sign-out-button";
 import { getDashboardData } from "@/lib/study-buddy/dashboard";
 
 const shellCard =
   "rounded-[28px] border border-slate-200/70 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.06)] backdrop-blur";
+
+export const dynamic = "force-dynamic";
 
 export default async function FocusPage() {
   const dashboard = await getDashboardData();
@@ -95,6 +98,7 @@ export default async function FocusPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <LiveNow />
             <div className="hidden items-center gap-2 rounded-full border border-emerald-100 bg-white/80 px-4 py-2 sm:flex">
               <Search className="h-4 w-4 text-emerald-700/70" />
               <span className="text-sm text-slate-500">Search your study topics...</span>

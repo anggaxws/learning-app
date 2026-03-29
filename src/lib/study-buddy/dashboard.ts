@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from "next/cache";
 import {
   eachDayOfInterval,
   eachWeekOfInterval,
@@ -220,6 +221,8 @@ function buildDashboardData({
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
+  noStore();
+
   if (!isSupabaseConfigured()) {
     return {
       ...buildDashboardData({
