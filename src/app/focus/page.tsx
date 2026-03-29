@@ -34,7 +34,7 @@ export default async function FocusPage() {
     );
   }
 
-  const firstName = dashboard.profileName.split(" ")[0] || "Study Buddy";
+  const firstName = dashboard.profileName.split(" ")[0] || "Sinlernix";
   const bestDay = [...dashboard.weeklyProgress].sort(
     (a, b) => b.focusMinutes - a.focusMinutes,
   )[0];
@@ -44,7 +44,7 @@ export default async function FocusPage() {
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-emerald-100 bg-[#f7fbf8] px-4 py-6 md:flex md:flex-col">
         <div className="px-4">
           <h1 className="font-display text-2xl font-bold tracking-tight text-emerald-900">
-            Study Buddy
+            Sinlernix
           </h1>
           <p className="mt-1 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700/70">
             Stay Focused
@@ -112,7 +112,7 @@ export default async function FocusPage() {
       <div className="mx-auto max-w-7xl px-6 pb-24 pt-8 md:ml-64 md:px-8">
         <div className="space-y-8">
           <section className={`${shellCard} p-8 lg:p-10`} id="focus-timer">
-            <FocusTimer demoMode={dashboard.demoMode} />
+            <FocusTimer />
           </section>
 
           <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -207,7 +207,6 @@ export default async function FocusPage() {
                 placeholder="Example: Complete research chapter 4"
                 className="rounded-full border border-slate-200 bg-white px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-[#0f7669]"
                 required
-                disabled={dashboard.demoMode}
               />
               <div className="grid gap-3 sm:grid-cols-2">
                 <input
@@ -215,17 +214,15 @@ export default async function FocusPage() {
                   type="text"
                   placeholder="Category"
                   className="rounded-full border border-slate-200 bg-white px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-[#0f7669]"
-                  disabled={dashboard.demoMode}
                 />
                 <input
                   name="targetDate"
                   type="date"
                   defaultValue={format(new Date(), "yyyy-MM-dd")}
                   className="rounded-full border border-slate-200 bg-white px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-[#0f7669]"
-                  disabled={dashboard.demoMode}
                 />
               </div>
-              <SubmitButton disabled={dashboard.demoMode}>Add goal</SubmitButton>
+              <SubmitButton>Add goal</SubmitButton>
             </form>
 
             <div className="mt-8 space-y-4">
@@ -273,8 +270,7 @@ export default async function FocusPage() {
                         />
                         <button
                           type="submit"
-                          disabled={dashboard.demoMode}
-                          className={`grid h-9 w-9 place-items-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={`grid h-9 w-9 place-items-center rounded-full border transition ${
                             goal.completed
                               ? "border-slate-200 bg-slate-100 text-slate-500"
                               : "border-[#0f7669]/30 bg-white text-[#0f7669]"

@@ -8,7 +8,6 @@ import {
   subDays,
 } from "date-fns";
 
-import { demoGoals, demoSessions } from "@/lib/study-buddy/demo-data";
 import {
   getAuthenticatedUser,
   isSupabaseConfigured,
@@ -27,12 +26,10 @@ function buildDashboardData({
   goals,
   sessions,
   profileName,
-  demoMode,
 }: {
   goals: GoalRecord[];
   sessions: FocusSessionRecord[];
   profileName: string;
-  demoMode: boolean;
 }): DashboardData {
   const today = startOfToday();
   const week = eachDayOfInterval({ start: subDays(today, 6), end: today });
@@ -146,7 +143,6 @@ function buildDashboardData({
   return {
     profileName,
     todayLabel: format(today, "EEEE, d MMMM yyyy"),
-    demoMode,
     authRequired: false,
     goalStats: {
       total: todayGoals.length,
@@ -176,12 +172,14 @@ function buildDashboardData({
 
 export async function getDashboardData(): Promise<DashboardData> {
   if (!isSupabaseConfigured()) {
-    return buildDashboardData({
-      goals: demoGoals,
-      sessions: demoSessions,
-      profileName: "Study Buddy Explorer",
-      demoMode: true,
-    });
+    return {
+      ...buildDashboardData({
+        goals: [],
+        sessions: [],
+        profileName: "Sinlernix",
+      }),
+      authRequired: true,
+    };
   }
 
   try {
@@ -196,8 +194,7 @@ export async function getDashboardData(): Promise<DashboardData> {
         ...buildDashboardData({
           goals: [],
           sessions: [],
-          profileName: "Study Buddy",
-          demoMode: false,
+          profileName: "Sinlernix",
         }),
         authRequired: true,
       };
@@ -234,15 +231,16 @@ export async function getDashboardData(): Promise<DashboardData> {
         user.user_metadata.full_name ??
         user.user_metadata.name ??
         user.email?.split("@")[0] ??
-        "Study Buddy",
-      demoMode: false,
+        "Sinlernix",
     });
   } catch {
-    return buildDashboardData({
-      goals: demoGoals,
-      sessions: demoSessions,
-      profileName: "Study Buddy Explorer",
-      demoMode: true,
-    });
+    return {
+      ...buildDashboardData({
+        goals: [],
+        sessions: [],
+        profileName: "Sinlernix",
+      }),
+      authRequired: true,
+    };
   }
 }

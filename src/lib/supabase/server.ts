@@ -62,7 +62,7 @@ export async function ensureProfile(user: User) {
     user.user_metadata.full_name ??
     user.user_metadata.name ??
     user.email?.split("@")[0] ??
-    "Study Buddy User";
+    "Sinlernix User";
 
   await supabase.from("profiles").upsert({
     id: user.id,

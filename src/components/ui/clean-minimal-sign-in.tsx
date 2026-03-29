@@ -49,7 +49,7 @@ export function CleanMinimalSignIn({
               Keep your focus, streak, and deep work in one place.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-              Sign in to sync your Study Buddy dashboard across sessions and keep every focus
+              Sign in to sync your Sinlernix dashboard across sessions and keep every focus
               timer saved automatically.
             </p>
             <div className="mt-10 grid max-w-xl gap-4 sm:grid-cols-2">

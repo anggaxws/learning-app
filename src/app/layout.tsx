@@ -13,9 +13,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Study Buddy",
+  title: "Sinlernix",
   description:
-    "Web app untuk menjaga konsistensi belajar lewat daily goals, focus sessions, dan streak tracking.",
+    "Sinlernix helps learners stay consistent through daily goals, focus sessions, and streak tracking.",
 };
 
 export default function RootLayout({

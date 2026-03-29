@@ -36,7 +36,7 @@ function formatTime(totalSeconds: number) {
   return `${minutes}:${seconds}`;
 }
 
-export function FocusTimer({ demoMode }: { demoMode: boolean }) {
+export function FocusTimer() {
   const router = useRouter();
   const [selectedPreset, setSelectedPreset] = useState(presets[0].id);
   const [subject, setSubject] = useState("Pomodoro Session");
@@ -138,7 +138,7 @@ export function FocusTimer({ demoMode }: { demoMode: boolean }) {
   }
 
   function handleStart() {
-    if (demoMode || isPending) {
+    if (isPending) {
       return;
     }
 
@@ -202,7 +202,7 @@ export function FocusTimer({ demoMode }: { demoMode: boolean }) {
             onChange={(event) => setSubject(event.target.value)}
             placeholder="Example: React state management"
             className="rounded-full border border-slate-200 bg-white px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-[#0f7669]"
-            disabled={demoMode || isRunning || isPending}
+            disabled={isRunning || isPending}
           />
           <div className="rounded-full border border-slate-200 bg-white px-5 py-4">
             <input
@@ -217,7 +217,7 @@ export function FocusTimer({ demoMode }: { demoMode: boolean }) {
                 setRemainingSeconds(Math.max(1, Number(nextValue) || 25) * 60);
               }}
               className="w-full bg-transparent text-sm font-semibold text-slate-900 outline-none"
-              disabled={demoMode || isRunning || isPending}
+              disabled={isRunning || isPending}
             />
             <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">
               custom mins
@@ -228,19 +228,12 @@ export function FocusTimer({ demoMode }: { demoMode: boolean }) {
         <button
           type="button"
           onClick={isRunning ? handlePause : handleStart}
-          disabled={demoMode || isPending}
+          disabled={isPending}
           className="inline-flex items-center gap-3 rounded-full bg-[#0f7669] px-7 py-4 text-base font-semibold text-white shadow-[0_18px_36px_rgba(15,118,105,0.3)] transition hover:bg-[#0d6a5f] disabled:cursor-not-allowed disabled:opacity-50"
         >
           Start your focus session
           <span className="text-xl leading-none">-&gt;</span>
         </button>
-
-        {demoMode ? (
-          <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            The timer is disabled because the app is still using demo data.
-            Connect Supabase to save your focus sessions automatically.
-          </p>
-        ) : null}
 
         {statusMessage ? (
           <p
@@ -311,7 +304,7 @@ export function FocusTimer({ demoMode }: { demoMode: boolean }) {
               <button
                 type="button"
                 onClick={isRunning ? handlePause : handleStart}
-                disabled={demoMode || isPending}
+                disabled={isPending}
                 className="grid h-14 w-14 place-items-center rounded-full bg-white text-slate-600 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isRunning ? (

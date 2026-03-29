@@ -1,6 +1,6 @@
-# Study Buddy
+# Sinlernix
 
-Study Buddy helps learners stay consistent with:
+Sinlernix helps learners stay consistent with:
 
 - `Daily Goals`
 - `Focus Sessions`
@@ -21,7 +21,6 @@ Core stack:
 - Automatic deep work logging when a timer finishes
 - Streak and recent milestone summaries
 - Google sign-in with Supabase Auth
-- Demo mode when Supabase is not configured yet
 
 ## Run locally
 
@@ -41,7 +40,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-If these values are missing, the app runs in demo mode.
+These values are required for the app to run correctly.
 
 ## Supabase setup
 

@@ -9,7 +9,6 @@ import {
   Settings,
   Sparkles,
   Timer,
-  TrendingUp,
   Trophy,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -27,7 +26,7 @@ export default async function Home() {
     return (
       <AuthPanel
         next="/"
-        title="Sign in to view your Study Buddy dashboard."
+        title="Sign in to view your Sinlernix dashboard."
         description="Use your Google account to sync your focus sessions, daily goals, and streak tracking across devices."
       />
     );
@@ -48,14 +47,14 @@ export default async function Home() {
     dashboard.streak.current > 0
       ? `You are on a ${dashboard.streak.current}-day streak. Keep this rhythm going for steadier learning progress.`
       : "Start with one short session today to build your learning rhythm again.";
-  const firstName = dashboard.profileName.split(" ")[0] || "Study Buddy";
+  const firstName = dashboard.profileName.split(" ")[0] || "Sinlernix";
 
   return (
     <main className="min-h-screen bg-[#f4f7f8] text-slate-800">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-emerald-100 bg-[#f7fbf8] px-4 py-6 md:flex md:flex-col">
         <div className="px-4">
           <h1 className="font-display text-2xl font-bold tracking-tight text-emerald-900">
-            Study Buddy
+            Sinlernix
           </h1>
           <p className="mt-1 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700/70">
             Stay Focused
@@ -116,7 +115,7 @@ export default async function Home() {
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 rounded-full border border-emerald-100 bg-white/80 px-4 py-2 sm:flex">
               <Search className="h-4 w-4 text-emerald-700/70" />
-              <span className="text-sm text-slate-500">Search learning insights...</span>
+              <span className="text-sm text-slate-500">Search insights...</span>
             </div>
             <button className="rounded-full p-2 text-slate-500 transition hover:bg-emerald-100">
               <Bell className="h-5 w-5" />
@@ -145,10 +144,6 @@ export default async function Home() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
           <section className={`${shellCard} md:col-span-8 p-8`}>
             <div className="relative overflow-hidden">
-              <div className="pointer-events-none absolute top-2 right-0 text-emerald-100/90">
-                <TrendingUp className="h-24 w-24 stroke-[1.25]" />
-              </div>
-
             <div className="mb-10 flex items-end justify-between gap-4">
               <div>
                 <h3 className="font-display text-2xl font-bold text-slate-950">
