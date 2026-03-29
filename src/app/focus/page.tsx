@@ -22,7 +22,7 @@ export default async function FocusPage() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7fafc_55%,_#f3f6f7_100%)] text-slate-800">
+    <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7fafc_55%,_#f3f6f7_100%)] pb-20 text-slate-800 md:pb-0">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-emerald-100 bg-[#f7fbf8] px-4 py-6 md:flex md:flex-col">
         <div className="px-4">
           <h1 className="font-display text-2xl font-bold tracking-tight text-emerald-900">
@@ -56,9 +56,9 @@ export default async function FocusPage() {
       </aside>
 
       <div className="md:ml-64">
-        <div className="relative mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6 py-12">
-          <div className="pointer-events-none absolute left-[16%] top-[58%] h-44 w-44 rounded-full bg-[#b7f1e8]/20 blur-3xl" />
-          <div className="pointer-events-none absolute right-[22%] top-[28%] h-28 w-28 rounded-full bg-[#ffe7a6]/30 blur-3xl" />
+        <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl items-center justify-center px-4 py-10 sm:px-6 sm:py-12">
+          <div className="pointer-events-none absolute left-[6%] top-[62%] h-32 w-32 rounded-full bg-[#b7f1e8]/20 blur-3xl sm:left-[16%] sm:h-44 sm:w-44" />
+          <div className="pointer-events-none absolute right-[8%] top-[22%] h-20 w-20 rounded-full bg-[#ffe7a6]/30 blur-3xl sm:right-[22%] sm:top-[28%] sm:h-28 sm:w-28" />
           <FocusTimer />
         </div>
       </div>

@@ -69,7 +69,7 @@ export default async function Home() {
   const quoteIndex = Math.floor((now.getHours() * 60 + now.getMinutes()) / 5) % 6;
 
   return (
-    <main className="min-h-screen bg-[#f4f7f8] text-slate-800">
+    <main className="min-h-screen bg-[#f4f7f8] pb-20 text-slate-800 md:pb-0">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-emerald-100 bg-[#f7fbf8] px-4 py-6 md:flex md:flex-col">
         <div className="px-4">
           <h1 className="font-display text-2xl font-bold tracking-tight text-emerald-900">
@@ -144,16 +144,16 @@ export default async function Home() {
       </header>
 
       <div className="md:ml-64">
-        <div className="mx-auto w-full max-w-[1320px] px-6 pb-24 pt-8 md:px-8">
+        <div className="mx-auto w-full max-w-[1320px] px-4 pb-24 pt-6 sm:px-6 sm:pt-8 md:px-8">
         <section className="mb-10">
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-amber-700">
             Weekly Overview
           </p>
-          <h1 className="font-display mt-3 max-w-4xl text-4xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">
+          <h1 className="font-display mt-3 max-w-4xl text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-5xl">
             You are in the <span className="text-emerald-700 italic">flow zone</span>,
             {" "}{firstName}.
           </h1>
-          <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-slate-600">
+          <p className="mt-4 max-w-2xl text-base font-medium leading-7 text-slate-600 sm:text-lg sm:leading-8">
             {insightMessage}
           </p>
         </section>
@@ -173,7 +173,7 @@ export default async function Home() {
                 <summary className="grid h-12 w-12 cursor-pointer list-none place-items-center rounded-full bg-[#83ead9] text-[#0f7669] transition hover:scale-[0.98]">
                   <Plus className="h-5 w-5 transition group-open:rotate-45" />
                 </summary>
-                <div className="absolute right-0 top-16 z-20 w-[21rem] rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_24px_60px_rgba(15,23,42,0.12)]">
+                <div className="absolute right-0 top-16 z-20 w-[18.5rem] rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_24px_60px_rgba(15,23,42,0.12)] sm:w-[21rem]">
                   <p className="text-sm font-bold uppercase tracking-[0.22em] text-slate-400">
                     Add Goal
                   </p>
@@ -210,7 +210,7 @@ export default async function Home() {
                 dashboard.todayGoals.slice(0, 3).map((goal) => (
                   <div
                     key={goal.id}
-                    className={`flex items-center justify-between gap-4 rounded-[28px] border bg-white px-6 py-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] ${
+                    className={`flex flex-col gap-4 rounded-[28px] border bg-white px-5 py-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)] sm:flex-row sm:items-center sm:justify-between sm:px-6 ${
                       goal.completed
                         ? "border-amber-200/80"
                         : "border-slate-100"
@@ -256,7 +256,7 @@ export default async function Home() {
                       <summary className="cursor-pointer list-none text-slate-300 transition hover:text-slate-500">
                         <EllipsisVertical className="h-5 w-5" />
                       </summary>
-                      <div className="absolute right-0 top-8 z-20 w-[20rem] rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.12)]">
+                      <div className="absolute right-0 top-8 z-20 w-[17.5rem] rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.12)] sm:w-[20rem]">
                         <div className="mb-3 flex items-center gap-2 text-slate-700">
                           <Edit3 className="h-4 w-4" />
                           <p className="text-sm font-semibold">Edit goal</p>
@@ -305,22 +305,22 @@ export default async function Home() {
           </section>
 
           <div className="grid gap-6">
-            <section className="rounded-[28px] border border-sky-100 bg-[#bfe6ff] p-7 shadow-[0_18px_50px_rgba(14,116,144,0.08)]">
+            <section className="rounded-[28px] border border-sky-100 bg-[#bfe6ff] p-6 shadow-[0_18px_50px_rgba(14,116,144,0.08)] sm:p-7">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-display text-3xl font-bold text-slate-800">
+                  <h3 className="font-display text-2xl font-bold text-slate-800 sm:text-3xl">
                     Momentum
                   </h3>
                 </div>
                 <div className="text-sky-100">
-                  <ArrowRight className="h-16 w-16 rotate-[-45deg]" />
+                  <ArrowRight className="h-12 w-12 rotate-[-45deg] sm:h-16 sm:w-16" />
                 </div>
               </div>
 
               <div className="mt-5 grid grid-cols-2 gap-4">
                 <div className="border-r border-slate-400/20 pr-4">
                   <div className="flex items-center gap-2">
-                    <p className="text-5xl font-bold text-slate-800">{dashboard.streak.current}</p>
+                    <p className="text-4xl font-bold text-slate-800 sm:text-5xl">{dashboard.streak.current}</p>
                     <Sparkles className="h-5 w-5 text-amber-600" />
                   </div>
                   <p className="mt-2 text-sm font-bold uppercase tracking-[0.16em] text-slate-500">
@@ -328,7 +328,7 @@ export default async function Home() {
                   </p>
                 </div>
                 <div className="pl-2">
-                  <p className="text-5xl font-bold text-slate-800">{todayFocusMinutes}</p>
+                  <p className="text-4xl font-bold text-slate-800 sm:text-5xl">{todayFocusMinutes}</p>
                   <p className="mt-2 text-sm font-bold uppercase tracking-[0.16em] text-slate-500">
                     Focus Minutes Today
                   </p>
@@ -336,8 +336,8 @@ export default async function Home() {
               </div>
             </section>
 
-            <section className={`${shellCard} p-7`}>
-              <h3 className="font-display text-3xl font-bold text-slate-900">
+            <section className={`${shellCard} p-6 sm:p-7`}>
+              <h3 className="font-display text-2xl font-bold text-slate-900 sm:text-3xl">
                 Today&apos;s Snapshot
               </h3>
 
@@ -346,7 +346,7 @@ export default async function Home() {
                   <Trophy className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-2xl font-semibold text-slate-900">{snapshotTitle}</p>
+                  <p className="text-xl font-semibold text-slate-900 sm:text-2xl">{snapshotTitle}</p>
                   <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
                     {snapshotDescription}
                   </p>
@@ -371,7 +371,7 @@ export default async function Home() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
           <FocusActivityCard months={dashboard.focusActivityMonths} />
 
-          <section className="md:col-span-4 rounded-[28px] border border-amber-200/70 bg-amber-50/90 p-8">
+          <section className="rounded-[28px] border border-amber-200/70 bg-amber-50/90 p-6 md:col-span-4 sm:p-8">
             <div className="mb-6 flex items-start justify-between">
               <div className="grid h-12 w-12 place-items-center rounded-full bg-amber-200 text-amber-900">
                 <Sparkles className="h-5 w-5" />
@@ -380,7 +380,7 @@ export default async function Home() {
                 Peak Performance
               </span>
             </div>
-            <h3 className="font-display text-5xl font-bold text-amber-950">
+            <h3 className="font-display text-4xl font-bold text-amber-950 sm:text-5xl">
               {dashboard.focusStats.averageMinutes || 0}
             </h3>
             <p className="mt-2 font-semibold text-amber-700">
@@ -515,10 +515,10 @@ function MiniMetric({
   label: string;
 }) {
   return (
-    <div className={`${shellCard} flex min-h-[12rem] flex-col justify-between p-6`}>
+    <div className={`${shellCard} flex min-h-[10rem] flex-col justify-between p-5 sm:min-h-[12rem] sm:p-6`}>
       <div className="text-sky-700">{icon}</div>
       <div>
-        <p className="font-display text-4xl font-bold text-slate-950">{value}</p>
+        <p className="font-display text-3xl font-bold text-slate-950 sm:text-4xl">{value}</p>
         <p className="mt-1 text-xs font-bold uppercase tracking-[0.24em] text-slate-500">
           {label}
         </p>
@@ -548,15 +548,15 @@ function MilestoneItem({
         : "bg-sky-50 text-sky-700";
 
   return (
-    <div className="flex items-center gap-5">
-      <div className={`grid h-16 w-16 place-items-center rounded-full ${tone}`}>
+    <div className="flex items-start gap-4 sm:items-center sm:gap-5">
+      <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-full ${tone} sm:h-16 sm:w-16`}>
         {icon}
       </div>
       <div className="flex-1">
-        <h4 className="text-lg font-bold text-slate-900">{title}</h4>
+        <h4 className="text-base font-bold text-slate-900 sm:text-lg">{title}</h4>
         <p className="text-sm text-slate-500">{description}</p>
       </div>
-      <div className="text-right">
+      <div className="shrink-0 text-right">
         <span className="block text-xs font-bold uppercase tracking-[0.24em] text-slate-400">
           Recent
         </span>
