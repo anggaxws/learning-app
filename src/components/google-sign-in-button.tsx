@@ -7,9 +7,11 @@ import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 export function GoogleSignInButton({
   next = "/",
   className = "",
+  children,
 }: {
   next?: string;
   className?: string;
+  children?: React.ReactNode;
 }) {
   const [pending, setPending] = useState(false);
 
@@ -37,7 +39,7 @@ export function GoogleSignInButton({
       disabled={pending}
       className={className}
     >
-      {pending ? "Redirecting..." : "Continue with Google"}
+      {pending ? "Redirecting..." : children ?? "Continue with Google"}
     </button>
   );
 }
