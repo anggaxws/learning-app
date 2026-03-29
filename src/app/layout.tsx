@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Space_Grotesk } from "next/font/google";
+import { FloatingFocusBubble } from "@/components/floating-focus-bubble";
+import { FocusTimerProvider } from "@/components/focus-timer-provider";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -28,7 +30,12 @@ export default function RootLayout({
       lang="en"
       className={`${manrope.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <FocusTimerProvider>
+          {children}
+          <FloatingFocusBubble />
+        </FocusTimerProvider>
+      </body>
     </html>
   );
 }

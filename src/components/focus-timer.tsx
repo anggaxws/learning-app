@@ -1,31 +1,9 @@
 "use client";
 
-import { useEffect, useEffectEvent, useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-
 import clsx from "clsx";
-import { Bell, Pause, Play, RotateCcw } from "lucide-react";
+import { Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
 
-const presets = [
-  {
-    id: "pomodoro",
-    label: "Pomodoro",
-    description: "25 minutes of focus, ideal for getting started.",
-    minutes: 25,
-  },
-  {
-    id: "sprint",
-    label: "Sprint",
-    description: "45 minutes for a solid study sprint.",
-    minutes: 45,
-  },
-  {
-    id: "deep-work",
-    label: "Deep Work",
-    description: "60 minutes for topics that need full concentration.",
-    minutes: 60,
-  },
-];
+import { useFocusTimer } from "@/components/focus-timer-provider";
 
 function formatTime(totalSeconds: number) {
   const minutes = Math.floor(totalSeconds / 60)
@@ -37,302 +15,141 @@ function formatTime(totalSeconds: number) {
 }
 
 export function FocusTimer() {
-  const router = useRouter();
-  const [selectedPreset, setSelectedPreset] = useState(presets[0].id);
-  const [subject, setSubject] = useState("Pomodoro Session");
-  const [customMinutes, setCustomMinutes] = useState("25");
-  const [remainingSeconds, setRemainingSeconds] = useState(presets[0].minutes * 60);
-  const [isRunning, setIsRunning] = useState(false);
-  const [hasCompleted, setHasCompleted] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const {
+    presets,
+    selectedPresetId,
+    selectedLabel,
+    sessionMinutes,
+    remainingSeconds,
+    isRunning,
+    isMuted,
+    statusMessage,
+    selectPreset,
+    startTimer,
+    resetTimer,
+    toggleMute,
+  } = useFocusTimer();
 
-  const selected = useMemo(
-    () => presets.find((preset) => preset.id === selectedPreset) ?? presets[0],
-    [selectedPreset],
-  );
-
-  const activeMinutes =
-    selectedPreset === "custom"
-      ? Math.max(1, Number(customMinutes) || 25)
-      : selected.minutes;
-
-  const saveCompletedSession = useEffectEvent(async () => {
-    const safeSubject = subject.trim() || `${selected.label} Session`;
-
-    startTransition(async () => {
-      const response = await fetch("/api/focus-sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subject: safeSubject,
-          duration: activeMinutes,
-          preset: selectedPreset,
-        }),
-      });
-
-      if (!response.ok) {
-        setStatusMessage(
-          "The session finished, but it could not be saved. Try refreshing and running it again.",
-        );
-        return;
-      }
-
-      setStatusMessage(
-        "Your session is complete and has been saved to your focus history.",
-      );
-      router.refresh();
-    });
-  });
-
-  useEffect(() => {
-    if (!isRunning) {
-      return;
-    }
-
-    const interval = window.setInterval(() => {
-      setRemainingSeconds((current) => {
-        if (current <= 1) {
-          window.clearInterval(interval);
-          setIsRunning(false);
-          setHasCompleted(true);
-          return 0;
-        }
-
-        return current - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(interval);
-  }, [isRunning]);
-
-  useEffect(() => {
-    if (!hasCompleted || remainingSeconds > 0) {
-      return;
-    }
-
-    void saveCompletedSession();
-  }, [hasCompleted, remainingSeconds]);
-
-  const circumference = 2 * Math.PI * 54;
-  const progress = remainingSeconds / (activeMinutes * 60);
-  const strokeDashoffset = circumference * (1 - progress);
-  const ringSegments = Array.from({ length: 6 }, (_, index) => index);
-
-  function handlePresetChange(presetId: string) {
-    setSelectedPreset(presetId);
-    setHasCompleted(false);
-    setStatusMessage(null);
-    setIsRunning(false);
-
-    if (presetId !== "custom") {
-      const preset = presets.find((item) => item.id === presetId) ?? presets[0];
-      setSubject(`${preset.label} Session`);
-      setRemainingSeconds(preset.minutes * 60);
-      return;
-    }
-
-    setRemainingSeconds(Math.max(1, Number(customMinutes) || 25) * 60);
-  }
-
-  function handleStart() {
-    if (isPending) {
-      return;
-    }
-
-    setStatusMessage(null);
-    setHasCompleted(false);
-    setIsRunning(true);
-  }
-
-  function handlePause() {
-    setIsRunning(false);
-  }
-
-  function handleReset() {
-    setIsRunning(false);
-    setHasCompleted(false);
-    setStatusMessage(null);
-    setRemainingSeconds(activeMinutes * 60);
-  }
+  const progress = remainingSeconds / (sessionMinutes * 60);
+  const dashArray = 2 * Math.PI * 150;
+  const dashOffset = dashArray * (1 - progress);
 
   return (
-    <div className="grid gap-10 xl:grid-cols-[0.92fr_1.08fr] xl:items-center">
-      <div className="space-y-6">
-        <div className="inline-flex items-center rounded-full bg-[#fde9b8] px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#6c5a18]">
-          Mindful Moment
-        </div>
+    <section
+      id="focus-timer"
+      className="relative mx-auto flex w-full max-w-3xl flex-col items-center text-center"
+    >
+      <p className="text-[11px] font-bold uppercase tracking-[0.42em] text-[#0f7a70]/75">
+        Quiet Your Mind
+      </p>
+      <h1 className="font-display mt-3 text-5xl font-bold tracking-tight text-slate-800 sm:text-6xl">
+        Focus Session
+      </h1>
 
-        <div className="max-w-md space-y-4">
-          <h3 className="font-display text-5xl leading-[1.05] font-bold tracking-tight text-slate-800">
-            Ready to dive
-            <br />
-            into <span className="italic text-[#0e7a6f]">Deep Work</span>?
-          </h3>
-          <p className="max-w-sm text-lg leading-8 text-slate-500">
-            Eliminate distractions and enter your flow state. Your supportive
-            companion is here to guide your focus.
+      <div className="mt-8 inline-flex rounded-full border border-slate-200 bg-[#f3f6f7] p-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.04)]">
+        {presets.map((preset) => (
+          <button
+            key={preset.id}
+            type="button"
+            onClick={() => selectPreset(preset.id)}
+            className={clsx(
+              "rounded-full px-6 py-3 text-sm font-semibold transition sm:px-8",
+              selectedPresetId === preset.id
+                ? "bg-white text-[#0f7a70] shadow-[0_8px_18px_rgba(15,23,42,0.06)]"
+                : "text-slate-500 hover:text-slate-700",
+            )}
+          >
+            {preset.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="relative mt-12 grid h-[24rem] w-[24rem] place-items-center sm:h-[28rem] sm:w-[28rem]">
+        <div className="absolute h-full w-full rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.98)_40%,_rgba(242,246,247,0.85)_78%,_rgba(233,239,241,0.55)_100%)] shadow-[0_35px_90px_rgba(15,23,42,0.08)]" />
+        <div className="absolute inset-[1.1rem] rounded-full border border-slate-100" />
+
+        <svg
+          className="absolute h-[21rem] w-[21rem] -rotate-90 sm:h-[24rem] sm:w-[24rem]"
+          viewBox="0 0 360 360"
+        >
+          <circle
+            cx="180"
+            cy="180"
+            r="150"
+            fill="none"
+            stroke="#e8eff2"
+            strokeWidth="8"
+          />
+          <circle
+            cx="180"
+            cy="180"
+            r="150"
+            fill="none"
+            stroke="#0f7a70"
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeDasharray={dashArray}
+            strokeDashoffset={dashOffset}
+          />
+        </svg>
+
+        <div className="absolute inset-[3rem] rounded-full bg-[radial-gradient(circle,_#ffffff_0%,_#fbfcfd_75%,_#f3f6f8_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] sm:inset-[3.8rem]" />
+
+        <div className="relative z-10 flex flex-col items-center">
+          <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-[#6a7f95]">
+            Remaining
+          </p>
+          <p className="font-display mt-3 text-7xl font-bold leading-none tracking-tight text-slate-800 sm:text-[5.8rem]">
+            {formatTime(remainingSeconds)}
+          </p>
+          <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.34em] text-[#6a7f95]">
+            {selectedLabel}
           </p>
         </div>
+      </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          {presets.map((preset) => (
-            <button
-              key={preset.id}
-              type="button"
-              onClick={() => handlePresetChange(preset.id)}
-              className={clsx(
-                "rounded-[24px] border px-4 py-3 text-left transition",
-                selectedPreset === preset.id
-                  ? "border-[#0f7669] bg-[#0f7669] text-white shadow-[0_16px_30px_rgba(15,118,105,0.22)]"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300",
-              )}
-            >
-              <p className="text-sm font-semibold">{preset.label}</p>
-              <p className="mt-1 text-xs opacity-80">{preset.description}</p>
-            </button>
-          ))}
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-[1fr_130px]">
-          <input
-            value={subject}
-            onChange={(event) => setSubject(event.target.value)}
-            placeholder="Example: React state management"
-            className="rounded-full border border-slate-200 bg-white px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-[#0f7669]"
-            disabled={isRunning || isPending}
-          />
-          <div className="rounded-full border border-slate-200 bg-white px-5 py-4">
-            <input
-              type="number"
-              min="5"
-              step="5"
-              value={customMinutes}
-              onChange={(event) => {
-                const nextValue = event.target.value;
-                setCustomMinutes(nextValue);
-                handlePresetChange("custom");
-                setRemainingSeconds(Math.max(1, Number(nextValue) || 25) * 60);
-              }}
-              className="w-full bg-transparent text-sm font-semibold text-slate-900 outline-none"
-              disabled={isRunning || isPending}
-            />
-            <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">
-              custom mins
-            </p>
-          </div>
-        </div>
+      <div className="mt-10 flex items-center gap-5">
+        <button
+          type="button"
+          onClick={resetTimer}
+          className="grid h-14 w-14 place-items-center rounded-full border border-slate-200 bg-white/80 text-slate-500 shadow-[0_14px_30px_rgba(15,23,42,0.06)] transition hover:bg-white"
+          aria-label="Reset session"
+        >
+          <RotateCcw className="h-5 w-5" />
+        </button>
 
         <button
           type="button"
-          onClick={isRunning ? handlePause : handleStart}
-          disabled={isPending}
-          className="inline-flex items-center gap-3 rounded-full bg-[#0f7669] px-7 py-4 text-base font-semibold text-white shadow-[0_18px_36px_rgba(15,118,105,0.3)] transition hover:bg-[#0d6a5f] disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={startTimer}
+          disabled={isRunning}
+          className="inline-flex min-w-[14rem] items-center justify-center gap-3 rounded-full bg-[#0f7a70] px-8 py-4 text-lg font-semibold text-white shadow-[0_20px_40px_rgba(15,122,112,0.3)] transition hover:bg-[#0d6c63] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Start your focus session
-          <span className="text-xl leading-none">-&gt;</span>
+          <Play className="h-4 w-4 fill-current" />
+          {isRunning ? "Session Running" : "Start Session"}
         </button>
 
-        {statusMessage ? (
-          <p
-            className={clsx(
-              "rounded-2xl px-4 py-3 text-sm",
-              statusMessage.includes("could not")
-                ? "bg-rose-50 text-rose-700"
-                : "bg-emerald-50 text-emerald-700",
-            )}
-          >
-            {statusMessage}
-          </p>
-        ) : null}
+        <button
+          type="button"
+          onClick={toggleMute}
+          className="grid h-14 w-14 place-items-center rounded-full border border-slate-200 bg-white/80 text-slate-500 shadow-[0_14px_30px_rgba(15,23,42,0.06)] transition hover:bg-white"
+          aria-label={isMuted ? "Unmute ticking sound" : "Mute ticking sound"}
+        >
+          {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+        </button>
       </div>
 
-      <div className="relative flex flex-col items-center justify-center gap-5">
-        <button className="absolute top-4 right-6 z-10 grid h-14 w-14 place-items-center rounded-full bg-[#ffcb58] text-[#5b4300] shadow-[0_16px_30px_rgba(255,203,88,0.35)]">
-          <Bell className="h-5 w-5" />
-        </button>
-
-        <div className="relative grid h-[24rem] w-[24rem] place-items-center rounded-full bg-[radial-gradient(circle,_#ffffff_0%,_#f9fbfc_60%,_#eef4f6_100%)] shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
-          <div className="absolute inset-[1.1rem] rounded-full border border-slate-100" />
-          <div className="absolute inset-[2.2rem] rounded-full border border-slate-100" />
-
-          {ringSegments.map((segment) => (
-            <div
-              key={segment}
-              className="absolute inset-0"
-              style={{ transform: `rotate(${segment * 60}deg)` }}
-            >
-              <div
-                className="absolute left-1/2 top-3 h-2 w-20 -translate-x-1/2 rounded-full bg-[#0f7b70]"
-                style={{ opacity: segment === 1 || segment === 4 ? 0.25 : 1 }}
-              />
-            </div>
-          ))}
-
-          <svg className="absolute h-[18rem] w-[18rem] -rotate-90" viewBox="0 0 120 120">
-            <circle
-              cx="60"
-              cy="60"
-              r="54"
-              fill="none"
-              stroke="#edf2f4"
-              strokeWidth="5"
-            />
-            <circle
-              cx="60"
-              cy="60"
-              r="54"
-              fill="none"
-              stroke="#0f7669"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-            />
-          </svg>
-
-          <div className="relative z-10 flex flex-col items-center text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.55em] text-[#2d6176]">
-              Focus
-            </p>
-            <p className="font-display mt-2 text-7xl font-bold leading-none tracking-tight text-slate-800">
-              {formatTime(remainingSeconds)}
-            </p>
-            <div className="mt-7 flex items-center justify-center gap-4">
-              <button
-                type="button"
-                onClick={isRunning ? handlePause : handleStart}
-                disabled={isPending}
-                className="grid h-14 w-14 place-items-center rounded-full bg-white text-slate-600 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isRunning ? (
-                  <Pause className="h-5 w-5" />
-                ) : (
-                  <Play className="h-5 w-5 fill-current" />
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={isPending}
-                className="grid h-14 w-14 place-items-center rounded-full bg-white text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <RotateCcw className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <p className="text-sm text-slate-500">
-          {isRunning
-            ? "Timer is running"
-            : hasCompleted
-              ? "Session complete"
-              : `${activeMinutes} minutes ready to start`}
+      {statusMessage ? (
+        <p
+          className={clsx(
+            "mt-6 rounded-full px-5 py-3 text-sm font-medium",
+            statusMessage.includes("failed")
+              ? "bg-rose-50 text-rose-700"
+              : "bg-emerald-50 text-emerald-700",
+          )}
+        >
+          {statusMessage}
         </p>
-      </div>
-    </div>
+      ) : null}
+    </section>
   );
 }

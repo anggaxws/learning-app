@@ -16,6 +16,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { format } from "date-fns";
+import Link from "next/link";
 import { addGoal, toggleGoalStatus, updateGoal } from "@/app/actions";
 import { AuthPanel } from "@/components/auth-panel";
 import { FocusActivityCard } from "@/components/focus-activity-card";
@@ -89,7 +90,7 @@ export default async function Home() {
           <NavItem
             href="/focus"
             icon={<Timer className="h-5 w-5" />}
-            label="Focus Session"
+            label="Focus Timer"
           />
           <NavItem
             href="/"
@@ -99,13 +100,13 @@ export default async function Home() {
         </nav>
 
         <div className="mt-auto space-y-4 px-2">
-          <a
-            href="/focus#focus-timer"
+          <Link
+            href="/focus"
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-200 px-5 py-4 text-sm font-bold text-emerald-900 transition hover:scale-[0.98]"
           >
             <Sparkles className="h-4 w-4" />
-            Start Session
-          </a>
+            Open Timer
+          </Link>
 
           <div className="space-y-1">
             <NavItem href="#" icon={<Settings className="h-4 w-4" />} label="Help" compact />
@@ -466,7 +467,7 @@ export default async function Home() {
 
       <nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-slate-200 bg-white/90 py-3 backdrop-blur md:hidden">
         <MobileNav active href="/" icon={<LayoutDashboard className="h-5 w-5" />} label="Home" />
-        <MobileNav href="/focus" icon={<Timer className="h-5 w-5" />} label="Focus" />
+        <MobileNav href="/focus" icon={<Timer className="h-5 w-5" />} label="Timer" />
         <MobileNav href="/" icon={<BarChart3 className="h-5 w-5" />} label="Progress" />
         <MobileNav href="#" icon={<Settings className="h-5 w-5" />} label="Profile" />
       </nav>
@@ -488,7 +489,7 @@ function NavItem({
   compact?: boolean;
 }) {
   return (
-    <a
+    <Link
       href={href}
       className={`mx-2 flex items-center gap-3 rounded-full px-4 transition ${
         compact ? "py-2 text-xs" : "py-3 text-sm"
@@ -500,7 +501,7 @@ function NavItem({
     >
       {icon}
       <span className="font-semibold">{label}</span>
-    </a>
+    </Link>
   );
 }
 
@@ -577,7 +578,7 @@ function MobileNav({
   active?: boolean;
 }) {
   return (
-    <a
+    <Link
       href={href}
       className={`flex flex-col items-center gap-1 text-[10px] font-bold ${
         active ? "text-emerald-700" : "text-slate-400"
@@ -585,7 +586,7 @@ function MobileNav({
     >
       {icon}
       <span>{label}</span>
-    </a>
+    </Link>
   );
 }
 
