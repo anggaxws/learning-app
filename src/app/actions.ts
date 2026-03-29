@@ -63,6 +63,35 @@ export async function toggleGoalStatus(formData: FormData) {
   revalidatePath("/focus");
 }
 
+export async function updateGoal(formData: FormData) {
+  if (!isSupabaseConfigured()) {
+    return;
+  }
+
+  const { supabase, user } = await getAuthenticatedUser();
+  const goalId = normalizeString(formData.get("goalId"));
+  const title = normalizeString(formData.get("title"));
+  const category = normalizeString(formData.get("category"), "General") || "General";
+  const targetDate = normalizeString(formData.get("targetDate"));
+
+  if (!supabase || !user || !goalId || !title || !targetDate) {
+    return;
+  }
+
+  await supabase
+    .from("daily_goals")
+    .update({
+      title,
+      category,
+      target_date: targetDate,
+    })
+    .eq("id", goalId)
+    .eq("user_id", user.id);
+
+  revalidatePath("/");
+  revalidatePath("/focus");
+}
+
 export async function logFocusSession(formData: FormData) {
   if (!isSupabaseConfigured()) {
     return;

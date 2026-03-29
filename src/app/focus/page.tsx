@@ -194,7 +194,7 @@ export default async function FocusPage() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h3 className="font-display text-3xl font-bold text-slate-900">
-                  Priority List
+                  Daily Goal
                 </h3>
                 <p className="mt-1 text-sm text-slate-500">
                   Focus on these tasks for todays success

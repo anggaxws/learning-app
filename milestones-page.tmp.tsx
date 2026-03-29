@@ -10,6 +10,7 @@ import {
   EllipsisVertical,
   LayoutDashboard,
   Plus,
+  Search,
   Settings,
   Sparkles,
   Timer,
@@ -133,6 +134,10 @@ export default async function Home() {
 
           <div className="flex items-center gap-3">
             <LiveNow />
+            <div className="hidden items-center gap-2 rounded-full border border-emerald-100 bg-white/80 px-4 py-2 sm:flex">
+              <Search className="h-4 w-4 text-emerald-700/70" />
+              <span className="text-sm text-slate-500">Search insights...</span>
+            </div>
             <button className="rounded-full p-2 text-slate-500 transition hover:bg-emerald-100">
               <Bell className="h-5 w-5" />
             </button>
@@ -457,6 +462,10 @@ export default async function Home() {
                   A quick look at your latest focus sessions and consistency wins
                 </p>
               </div>
+              <button className="inline-flex items-center gap-1 text-sm font-bold text-emerald-700 transition hover:underline">
+                View all
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
 
             <div className="space-y-6">
