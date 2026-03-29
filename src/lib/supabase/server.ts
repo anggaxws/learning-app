@@ -48,6 +48,10 @@ export async function getAuthenticatedUser() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (user) {
+    await ensureProfile(user);
+  }
+
   return { supabase, user };
 }
 

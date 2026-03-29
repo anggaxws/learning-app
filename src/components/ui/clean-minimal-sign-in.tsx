@@ -95,27 +95,7 @@ export function CleanMinimalSignIn({
     <div className="relative min-h-screen overflow-hidden bg-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(186,230,253,0.35),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(167,243,208,0.28),_transparent_30%)]" />
       <section className="relative mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6 py-12">
-        <div className="grid w-full max-w-5xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="hidden lg:block">
-            <p className="text-xs font-bold uppercase tracking-[0.32em] text-emerald-700/70">
-              Current Sanctuary
-            </p>
-            <h1 className="font-display mt-3 text-5xl font-bold leading-[1.05] text-slate-950">
-              Keep your focus, streak, and deep work in one place.
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-              Sign in to sync your Sinlernix dashboard across sessions and keep every focus
-              timer saved automatically.
-            </p>
-            <div className="mt-10 grid max-w-xl gap-4 sm:grid-cols-2">
-              <FeaturePill title="Focus Sessions" description="Auto-log deep work as soon as the timer ends." />
-              <FeaturePill title="Daily Goals" description="Keep your study plan visible and easy to finish." />
-              <FeaturePill title="Streak Tracking" description="Stay consistent with a clear picture of your momentum." />
-              <FeaturePill title="Google Sync" description="Use one account to continue on any device." />
-            </div>
-          </div>
-
-          <div className="w-full rounded-[32px] border border-sky-100 bg-gradient-to-b from-sky-50/70 to-white p-8 text-black shadow-[0_28px_90px_rgba(15,23,42,0.08)] sm:p-10">
+        <div className="w-full max-w-xl rounded-[32px] border border-sky-100 bg-gradient-to-b from-sky-50/70 to-white p-8 text-black shadow-[0_28px_90px_rgba(15,23,42,0.08)] sm:p-10">
             <div className="mb-6 flex items-center justify-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-lg shadow-slate-200/60">
                 <LogIn className="h-7 w-7 text-slate-900" />
@@ -226,7 +206,6 @@ export function CleanMinimalSignIn({
               <GoogleMark />
               Continue with Google
             </GoogleSignInButton>
-          </div>
         </div>
       </section>
     </div>
@@ -253,20 +232,5 @@ function GoogleMark() {
         d="M9 3.5809c1.3214 0 2.5077.4541 3.4405 1.3459l2.5814-2.5813C13.4591.8918 11.4218 0 9 0A8.9977 8.9977 0 0 0 .9573 4.965l2.9986 2.3318C4.665 5.1668 6.6518 3.5809 9 3.5809Z"
       />
     </svg>
-  );
-}
-
-function FeaturePill({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/70 bg-white/70 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.04)] backdrop-blur">
-      <p className="text-sm font-semibold text-slate-900">{title}</p>
-      <p className="mt-1 text-sm leading-6 text-slate-500">{description}</p>
-    </div>
   );
 }

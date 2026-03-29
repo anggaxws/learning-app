@@ -2,10 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import {
-  getAuthenticatedUser,
-  isSupabaseConfigured,
-} from "@/lib/supabase/server";
+import { getAuthenticatedUser, isSupabaseConfigured } from "@/lib/supabase/server";
 
 function normalizeString(value: FormDataEntryValue | null, fallback = "") {
   return typeof value === "string" ? value.trim() : fallback;
@@ -25,13 +22,18 @@ export async function addGoal(formData: FormData) {
     return;
   }
 
-  await supabase.from("daily_goals").insert({
+  const { error } = await supabase.from("daily_goals").insert({
     user_id: user.id,
     title,
     category,
     target_date: targetDate,
     completed: false,
   });
+
+  if (error) {
+    console.error("Failed to insert daily goal:", error.message);
+    return;
+  }
 
   revalidatePath("/");
   revalidatePath("/focus");
@@ -50,7 +52,7 @@ export async function toggleGoalStatus(formData: FormData) {
     return;
   }
 
-  await supabase
+  const { error } = await supabase
     .from("daily_goals")
     .update({
       completed,
@@ -58,6 +60,11 @@ export async function toggleGoalStatus(formData: FormData) {
     })
     .eq("id", goalId)
     .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Failed to toggle daily goal:", error.message);
+    return;
+  }
 
   revalidatePath("/");
   revalidatePath("/focus");
@@ -78,7 +85,7 @@ export async function updateGoal(formData: FormData) {
     return;
   }
 
-  await supabase
+  const { error } = await supabase
     .from("daily_goals")
     .update({
       title,
@@ -87,6 +94,11 @@ export async function updateGoal(formData: FormData) {
     })
     .eq("id", goalId)
     .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Failed to update daily goal:", error.message);
+    return;
+  }
 
   revalidatePath("/");
   revalidatePath("/focus");

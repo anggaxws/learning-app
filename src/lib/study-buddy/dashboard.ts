@@ -24,10 +24,6 @@ import type {
   GoalRecord,
 } from "@/types/study-buddy";
 
-function toDate(value: string | null) {
-  return value ? parseISO(value) : null;
-}
-
 function buildDailyProgress(
   start: Date,
   end: Date,
@@ -104,7 +100,7 @@ function buildDashboardData({
   const focusActivityMonths = buildFocusActivityMonths(today, goals, sessions);
 
   const todayGoals = goals
-    .filter((goal) => isSameDay(toDate(goal.target_date) ?? today, today))
+    .filter((goal) => goal.target_date === format(today, "yyyy-MM-dd"))
     .sort((a, b) => Number(a.completed) - Number(b.completed))
     .map((goal) => ({
       id: goal.id,
@@ -263,7 +259,7 @@ export async function getDashboardData(): Promise<DashboardData> {
             "id, title, category, target_date, completed, completed_at, created_at",
           )
           .eq("user_id", userId)
-          .gte("target_date", subDays(startOfToday(), 120).toISOString())
+          .gte("target_date", format(subDays(startOfToday(), 120), "yyyy-MM-dd"))
           .order("target_date", { ascending: false }),
         supabase
           .from("focus_sessions")
