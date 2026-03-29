@@ -1,11 +1,16 @@
 import {
   eachDayOfInterval,
+  eachWeekOfInterval,
+  endOfMonth,
+  endOfWeek,
   format,
   isSameDay,
   parseISO,
+  startOfMonth,
   startOfDay,
   startOfToday,
   subDays,
+  subMonths,
 } from "date-fns";
 
 import {
@@ -22,6 +27,68 @@ function toDate(value: string | null) {
   return value ? parseISO(value) : null;
 }
 
+function buildDailyProgress(
+  start: Date,
+  end: Date,
+  goals: GoalRecord[],
+  sessions: FocusSessionRecord[],
+) {
+  return eachDayOfInterval({ start, end }).map((day) => {
+    const completedGoals = goals.filter((goal) =>
+      goal.completed_at ? isSameDay(parseISO(goal.completed_at), day) : false,
+    ).length;
+    const focusMinutes = sessions
+      .filter((session) =>
+        session.completed_at ? isSameDay(parseISO(session.completed_at), day) : false,
+      )
+      .reduce((sum, session) => sum + session.duration_minutes, 0);
+
+    return {
+      date: format(day, "yyyy-MM-dd"),
+      weekday: format(day, "EE"),
+      dayOfMonth: format(day, "d"),
+      completedGoals,
+      focusMinutes,
+      active: completedGoals > 0 || focusMinutes > 0,
+    };
+  });
+}
+
+function buildFocusActivityMonths(
+  today: Date,
+  goals: GoalRecord[],
+  sessions: FocusSessionRecord[],
+) {
+  return Array.from({ length: 3 }, (_, index) => {
+    const monthAnchor = startOfMonth(subMonths(today, index));
+    const monthStart = startOfMonth(monthAnchor);
+    const monthEnd = endOfMonth(monthAnchor);
+    const weekStarts = eachWeekOfInterval(
+      { start: monthStart, end: monthEnd },
+      { weekStartsOn: 1 },
+    );
+
+    return {
+      id: format(monthStart, "yyyy-MM"),
+      label: format(monthStart, "MMM yyyy"),
+      weeks: weekStarts
+        .map((weekStart, weekIndex) => {
+          const boundedStart = weekStart < monthStart ? monthStart : weekStart;
+          const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+          const boundedEnd = weekEnd > monthEnd ? monthEnd : weekEnd;
+
+          return {
+            id: `${format(monthStart, "yyyy-MM")}-week-${weekIndex + 1}`,
+            label: `Week ${weekIndex + 1}`,
+            periodLabel: `${format(boundedStart, "MMM d")} - ${format(boundedEnd, "MMM d")}`,
+            days: buildDailyProgress(boundedStart, boundedEnd, goals, sessions),
+          };
+        })
+        .filter((week) => week.days.length > 0),
+    };
+  });
+}
+
 function buildDashboardData({
   goals,
   sessions,
@@ -32,7 +99,8 @@ function buildDashboardData({
   profileName: string;
 }): DashboardData {
   const today = startOfToday();
-  const week = eachDayOfInterval({ start: subDays(today, 6), end: today });
+  const weeklyProgress = buildDailyProgress(subDays(today, 6), today, goals, sessions);
+  const focusActivityMonths = buildFocusActivityMonths(today, goals, sessions);
 
   const todayGoals = goals
     .filter((goal) => isSameDay(toDate(goal.target_date) ?? today, today))
@@ -62,26 +130,6 @@ function buildDashboardData({
         ? format(parseISO(session.completed_at), "dd MMM, HH:mm")
         : "Not completed",
     }));
-
-  const weeklyProgress = week.map((day) => {
-    const completedGoals = goals.filter((goal) =>
-      goal.completed_at ? isSameDay(parseISO(goal.completed_at), day) : false,
-    ).length;
-    const focusMinutes = sessions
-      .filter((session) =>
-        session.completed_at ? isSameDay(parseISO(session.completed_at), day) : false,
-      )
-      .reduce((sum, session) => sum + session.duration_minutes, 0);
-
-    return {
-      date: format(day, "yyyy-MM-dd"),
-      weekday: format(day, "EE"),
-      dayOfMonth: format(day, "d"),
-      completedGoals,
-      focusMinutes,
-      active: completedGoals > 0 || focusMinutes > 0,
-    };
-  });
 
   const activeDays = new Set<string>();
 
@@ -144,6 +192,7 @@ function buildDashboardData({
     profileName,
     todayLabel: format(today, "EEEE, d MMMM yyyy"),
     authRequired: false,
+    focusActivityMonths,
     goalStats: {
       total: todayGoals.length,
       completed: todayGoals.filter((goal) => goal.completed).length,
@@ -210,7 +259,7 @@ export async function getDashboardData(): Promise<DashboardData> {
             "id, title, category, target_date, completed, completed_at, created_at",
           )
           .eq("user_id", userId)
-          .gte("target_date", subDays(startOfToday(), 30).toISOString())
+          .gte("target_date", subDays(startOfToday(), 120).toISOString())
           .order("target_date", { ascending: false }),
         supabase
           .from("focus_sessions")
@@ -218,7 +267,7 @@ export async function getDashboardData(): Promise<DashboardData> {
             "id, subject, duration_minutes, started_at, ended_at, completed_at, created_at",
           )
           .eq("user_id", userId)
-          .gte("completed_at", subDays(startOfToday(), 30).toISOString())
+          .gte("completed_at", subDays(startOfToday(), 120).toISOString())
           .order("completed_at", { ascending: false }),
         supabase.from("profiles").select("full_name").eq("id", userId).single(),
       ]);

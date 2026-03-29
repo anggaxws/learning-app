@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { AuthPanel } from "@/components/auth-panel";
+import { FocusActivityCard } from "@/components/focus-activity-card";
 import { getDashboardData } from "@/lib/study-buddy/dashboard";
 import { SignOutButton } from "@/components/sign-out-button";
 
@@ -32,9 +33,6 @@ export default async function Home() {
     );
   }
 
-  const bestFocusDay = [...dashboard.weeklyProgress].sort(
-    (a, b) => b.focusMinutes - a.focusMinutes,
-  )[0];
   const totalGoalsDone = dashboard.weeklyProgress.reduce(
     (sum, day) => sum + day.completedGoals,
     0,
@@ -97,7 +95,7 @@ export default async function Home() {
       </aside>
 
       <header className="sticky top-0 z-30 border-b border-emerald-100/80 bg-[#eef8f2]/85 backdrop-blur md:ml-64">
-        <div className="flex items-center justify-between px-6 py-4 md:px-8">
+        <div className="mx-auto flex w-full max-w-[1320px] items-center justify-between px-6 py-4 md:px-8">
           <div className="flex items-center gap-4">
             <div className="rounded-full bg-white p-2 text-emerald-800 shadow-sm md:hidden">
               <LayoutDashboard className="h-5 w-5" />
@@ -127,7 +125,8 @@ export default async function Home() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 pb-24 pt-8 md:ml-64 md:px-8">
+      <div className="md:ml-64">
+        <div className="mx-auto w-full max-w-[1320px] px-6 pb-24 pt-8 md:px-8">
         <section className="mb-10">
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-amber-700">
             Weekly Overview
@@ -142,69 +141,7 @@ export default async function Home() {
         </section>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-          <section className={`${shellCard} md:col-span-8 p-8`}>
-            <div className="relative overflow-hidden">
-            <div className="mb-10 flex items-end justify-between gap-4">
-              <div>
-                <h3 className="font-display text-2xl font-bold text-slate-950">
-                  Focus Activity
-                </h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Minutes spent in deep study sessions
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
-                  Weekly
-                </span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
-                  Monthly
-                </span>
-              </div>
-            </div>
-
-            <div className="flex h-56 items-end justify-between gap-5 pr-3">
-              {dashboard.weeklyProgress.map((day) => {
-                const outerHeight = Math.max(
-                  48,
-                  Math.min(160, 48 + (day.focusMinutes / 90) * 112),
-                );
-                const innerHeight = Math.max(
-                  16,
-                  Math.min(outerHeight - 10, 16 + (day.focusMinutes / 90) * 72),
-                );
-                const isBest = bestFocusDay?.date === day.date;
-
-                return (
-                  <div key={day.date} className="flex flex-1 flex-col items-center">
-                    <div className="flex h-44 w-full items-end justify-center">
-                      <div
-                        className={`relative w-full max-w-[64px] overflow-hidden rounded-t-[999px] transition-all ${
-                          isBest ? "bg-[#0f7669]" : "bg-[#d9f6f1]"
-                        }`}
-                        style={{ height: `${outerHeight}px` }}
-                      >
-                        {!isBest ? (
-                          <div
-                            className="absolute inset-x-0 bottom-0 rounded-t-[999px] bg-[#8ee7d8]"
-                            style={{ height: `${innerHeight}px` }}
-                          />
-                        ) : null}
-                      </div>
-                    </div>
-                    <span
-                      className={`mt-4 text-xs font-bold uppercase tracking-[0.24em] ${
-                        isBest ? "text-[#0f7669]" : "text-slate-600"
-                      }`}
-                    >
-                      {day.weekday}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            </div>
-          </section>
+          <FocusActivityCard months={dashboard.focusActivityMonths} />
 
           <section className="md:col-span-4 rounded-[28px] border border-amber-200/70 bg-amber-50/90 p-8">
             <div className="mb-6 flex items-start justify-between">
@@ -224,7 +161,16 @@ export default async function Home() {
             <p className="mt-6 text-sm leading-7 text-amber-900/70">
               Your strongest day this week is{" "}
               <span className="font-bold">
-                {bestFocusDay ? format(new Date(bestFocusDay.date), "EEEE") : "today"}
+                {dashboard.weeklyProgress.some((day) => day.focusMinutes > 0)
+                  ? format(
+                      new Date(
+                        [...dashboard.weeklyProgress].sort(
+                          (a, b) => b.focusMinutes - a.focusMinutes,
+                        )[0].date,
+                      ),
+                      "EEEE",
+                    )
+                  : "today"}
               </span>
               . Try placing your hardest material in your best focus window.
             </p>
@@ -317,6 +263,7 @@ export default async function Home() {
               )}
             </div>
           </section>
+        </div>
         </div>
       </div>
 

@@ -22,6 +22,23 @@ export type DashboardData = {
   profileName: string;
   todayLabel: string;
   authRequired: boolean;
+  focusActivityMonths: Array<{
+    id: string;
+    label: string;
+    weeks: Array<{
+      id: string;
+      label: string;
+      periodLabel: string;
+      days: Array<{
+        date: string;
+        weekday: string;
+        dayOfMonth: string;
+        completedGoals: number;
+        focusMinutes: number;
+        active: boolean;
+      }>;
+    }>;
+  }>;
   goalStats: {
     total: number;
     completed: number;

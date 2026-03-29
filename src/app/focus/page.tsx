@@ -79,7 +79,7 @@ export default async function FocusPage() {
       </aside>
 
       <header className="sticky top-0 z-30 border-b border-emerald-100/80 bg-[#eef8f2]/85 backdrop-blur md:ml-64">
-        <div className="flex items-center justify-between px-6 py-4 md:px-8">
+        <div className="mx-auto flex w-full max-w-[1320px] items-center justify-between px-6 py-4 md:px-8">
           <div className="flex items-center gap-4">
             <div className="rounded-full bg-white p-2 text-emerald-800 shadow-sm md:hidden">
               <Timer className="h-5 w-5" />
@@ -109,7 +109,8 @@ export default async function FocusPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 pb-24 pt-8 md:ml-64 md:px-8">
+      <div className="md:ml-64">
+        <div className="mx-auto w-full max-w-[1320px] px-6 pb-24 pt-8 md:px-8">
         <div className="space-y-8">
           <section className={`${shellCard} p-8 lg:p-10`} id="focus-timer">
             <FocusTimer />
@@ -290,6 +291,7 @@ export default async function FocusPage() {
               )}
             </div>
           </section>
+        </div>
         </div>
       </div>
 
