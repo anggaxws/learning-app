@@ -3,8 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import {
-  createServerSupabaseClient,
-  getStudyBuddyUserId,
+  getAuthenticatedUser,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
 
@@ -17,17 +16,17 @@ export async function addGoal(formData: FormData) {
     return;
   }
 
-  const supabase = createServerSupabaseClient();
+  const { supabase, user } = await getAuthenticatedUser();
   const title = normalizeString(formData.get("title"));
   const category = normalizeString(formData.get("category"), "General") || "General";
   const targetDate = normalizeString(formData.get("targetDate"));
 
-  if (!supabase || !title || !targetDate) {
+  if (!supabase || !user || !title || !targetDate) {
     return;
   }
 
   await supabase.from("daily_goals").insert({
-    user_id: getStudyBuddyUserId(),
+    user_id: user.id,
     title,
     category,
     target_date: targetDate,
@@ -35,6 +34,7 @@ export async function addGoal(formData: FormData) {
   });
 
   revalidatePath("/");
+  revalidatePath("/focus");
 }
 
 export async function toggleGoalStatus(formData: FormData) {
@@ -42,11 +42,11 @@ export async function toggleGoalStatus(formData: FormData) {
     return;
   }
 
-  const supabase = createServerSupabaseClient();
+  const { supabase, user } = await getAuthenticatedUser();
   const goalId = normalizeString(formData.get("goalId"));
   const completed = normalizeString(formData.get("completed")) === "true";
 
-  if (!supabase || !goalId) {
+  if (!supabase || !user || !goalId) {
     return;
   }
 
@@ -57,9 +57,10 @@ export async function toggleGoalStatus(formData: FormData) {
       completed_at: completed ? new Date().toISOString() : null,
     })
     .eq("id", goalId)
-    .eq("user_id", getStudyBuddyUserId());
+    .eq("user_id", user.id);
 
   revalidatePath("/");
+  revalidatePath("/focus");
 }
 
 export async function logFocusSession(formData: FormData) {
@@ -67,11 +68,11 @@ export async function logFocusSession(formData: FormData) {
     return;
   }
 
-  const supabase = createServerSupabaseClient();
+  const { supabase, user } = await getAuthenticatedUser();
   const subject = normalizeString(formData.get("subject"));
   const duration = Number(normalizeString(formData.get("duration")));
 
-  if (!supabase || !subject || Number.isNaN(duration) || duration <= 0) {
+  if (!supabase || !user || !subject || Number.isNaN(duration) || duration <= 0) {
     return;
   }
 
@@ -79,7 +80,7 @@ export async function logFocusSession(formData: FormData) {
   const endedAt = new Date(startedAt.getTime() + duration * 60 * 1000);
 
   await supabase.from("focus_sessions").insert({
-    user_id: getStudyBuddyUserId(),
+    user_id: user.id,
     subject,
     duration_minutes: duration,
     started_at: startedAt.toISOString(),
@@ -88,4 +89,5 @@ export async function logFocusSession(formData: FormData) {
   });
 
   revalidatePath("/");
+  revalidatePath("/focus");
 }

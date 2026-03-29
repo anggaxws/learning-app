@@ -2,8 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import {
-  createServerSupabaseClient,
-  getStudyBuddyUserId,
+  getAuthenticatedUser,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
 
@@ -32,9 +31,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const supabase = createServerSupabaseClient();
+  const { supabase, user } = await getAuthenticatedUser();
 
-  if (!supabase) {
+  if (!supabase || !user) {
     return NextResponse.json(
       { error: "Supabase client is unavailable." },
       { status: 500 },
@@ -46,7 +45,7 @@ export async function POST(request: Request) {
   const finalSubject = body.preset ? `${subject} (${body.preset})` : subject;
 
   const { error } = await supabase.from("focus_sessions").insert({
-    user_id: getStudyBuddyUserId(),
+    user_id: user.id,
     subject: finalSubject,
     duration_minutes: duration,
     started_at: startedAt.toISOString(),
@@ -59,6 +58,7 @@ export async function POST(request: Request) {
   }
 
   revalidatePath("/");
+  revalidatePath("/focus");
 
   return NextResponse.json({ ok: true });
 }

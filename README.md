@@ -1,82 +1,70 @@
 # Study Buddy
 
-Web app untuk membantu user tetap konsisten belajar lewat:
+Study Buddy helps learners stay consistent with:
 
 - `Daily Goals`
 - `Focus Sessions`
 - `Streak Tracking`
 
-Stack utama:
+Core stack:
 
 - `Next.js 16` + `App Router`
 - `Tailwind CSS 4`
-- `Supabase Postgres`
-- Backend berbasis `Next.js Server Actions`
+- `Supabase Auth + Postgres`
+- `Next.js Server Actions`
 
-## Kenapa backend ini dipilih
+## Features
 
-Karena app ini fokus pada CRUD ringan dan dashboard personal, `Server Actions` adalah opsi yang efisien:
+- Dashboard with weekly focus insights
+- Dedicated focus workspace with timer modes
+- Daily goals with completion tracking
+- Automatic deep work logging when a timer finishes
+- Streak and recent milestone summaries
+- Google sign-in with Supabase Auth
+- Demo mode when Supabase is not configured yet
 
-- front end dan backend tetap satu repo
-- cocok untuk insert/update sederhana
-- deployment lebih mudah karena tidak perlu API server terpisah
-- tetap bisa berkembang ke auth dan RLS Supabase nanti
-
-## Fitur yang sudah ada
-
-- Dashboard belajar dengan visual summary
-- Form tambah `Daily Goal`
-- Toggle goal selesai / belum selesai
-- Form catat `Focus Session`
-- Ringkasan `streak` dan progres 7 hari terakhir
-- `Demo mode` otomatis jika env Supabase belum diisi
-
-## Menjalankan project
+## Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Lalu buka `http://localhost:3000`.
+Open `http://localhost:3000`.
 
 ## Environment variables
 
-Salin `.env.example` menjadi `.env.local`.
+Copy `.env.example` to `.env.local`.
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_STUDY_BUDDY_USER_ID=
 ```
 
-Catatan:
+If these values are missing, the app runs in demo mode.
 
-- `SUPABASE_SERVICE_ROLE_KEY` dipakai di server untuk insert/update tanpa auth flow.
-- `NEXT_PUBLIC_STUDY_BUDDY_USER_ID` adalah id profile yang ingin dipakai app ini.
-- Jika env belum lengkap, app tetap jalan dengan demo data.
+## Supabase setup
 
-## Schema Supabase
+1. Create a Supabase project.
+2. Run [supabase/schema.sql](/d:/Coding/learning-app/supabase/schema.sql) in the Supabase `SQL Editor`.
+3. In `Authentication > Providers`, enable `Google`.
+4. Add your Google OAuth client ID and client secret in Supabase.
+5. In `Authentication > URL Configuration`, add `http://localhost:3000/auth/callback` as a redirect URL.
+6. Copy the project URL and anon key from `Project Settings > API` into `.env.local`.
 
-Jalankan SQL di [supabase/schema.sql](/d:/Coding/learning-app/supabase/schema.sql).
+After a successful sign-in, the app automatically creates or updates the user profile row.
 
-Sesudah itu:
+## Important files
 
-1. Buat satu row di tabel `profiles`.
-2. Ambil `id` profile tersebut.
-3. Isi `NEXT_PUBLIC_STUDY_BUDDY_USER_ID` dengan UUID tadi.
+- [src/app/page.tsx](/d:/Coding/learning-app/src/app/page.tsx): dashboard overview
+- [src/app/focus/page.tsx](/d:/Coding/learning-app/src/app/focus/page.tsx): focus workspace
+- [src/app/actions.ts](/d:/Coding/learning-app/src/app/actions.ts): server actions
+- [src/app/auth/callback/route.ts](/d:/Coding/learning-app/src/app/auth/callback/route.ts): OAuth callback
+- [src/lib/study-buddy/dashboard.ts](/d:/Coding/learning-app/src/lib/study-buddy/dashboard.ts): dashboard aggregation
+- [src/lib/supabase/server.ts](/d:/Coding/learning-app/src/lib/supabase/server.ts): Supabase server client
+- [src/middleware.ts](/d:/Coding/learning-app/src/middleware.ts): auth session refresh
 
-## Struktur penting
+## Notes
 
-- [src/app/page.tsx](/d:/Coding/learning-app/src/app/page.tsx): dashboard utama
-- [src/app/actions.ts](/d:/Coding/learning-app/src/app/actions.ts): backend write actions
-- [src/lib/study-buddy/dashboard.ts](/d:/Coding/learning-app/src/lib/study-buddy/dashboard.ts): aggregasi data dashboard
-- [src/lib/supabase/server.ts](/d:/Coding/learning-app/src/lib/supabase/server.ts): server client Supabase
-
-## Next step yang bagus
-
-- tambah autentikasi Supabase Auth
-- aktifkan Row Level Security per user
-- buat timer focus session real-time
-- tambah analytics mingguan dan monthly review
+- This app now uses authenticated user sessions instead of a fixed user ID.
+- Row Level Security is enabled so each user only accesses their own data.

@@ -5,7 +5,6 @@ import {
   BookOpen,
   CalendarRange,
   LayoutDashboard,
-  LogOut,
   Search,
   Settings,
   Sparkles,
@@ -14,13 +13,26 @@ import {
   Trophy,
 } from "lucide-react";
 import { format } from "date-fns";
+import { AuthPanel } from "@/components/auth-panel";
 import { getDashboardData } from "@/lib/study-buddy/dashboard";
+import { SignOutButton } from "@/components/sign-out-button";
 
 const shellCard =
   "rounded-[28px] border border-slate-200/70 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.06)] backdrop-blur";
 
 export default async function Home() {
   const dashboard = await getDashboardData();
+
+  if (dashboard.authRequired) {
+    return (
+      <AuthPanel
+        next="/"
+        title="Sign in to view your Study Buddy dashboard."
+        description="Use your Google account to sync your focus sessions, daily goals, and streak tracking across devices."
+      />
+    );
+  }
+
   const bestFocusDay = [...dashboard.weeklyProgress].sort(
     (a, b) => b.focusMinutes - a.focusMinutes,
   )[0];
@@ -80,7 +92,7 @@ export default async function Home() {
 
           <div className="space-y-1">
             <NavItem href="#" icon={<Settings className="h-4 w-4" />} label="Help" compact />
-            <NavItem href="#" icon={<LogOut className="h-4 w-4" />} label="Logout" compact />
+            <SignOutButton className="mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-full px-4 py-2 text-xs font-semibold text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-800" />
           </div>
         </div>
       </aside>
@@ -433,7 +445,7 @@ function MobileNav({
       }`}
     >
       {icon}
-        <span>{label}</span>
+      <span>{label}</span>
     </a>
   );
 }

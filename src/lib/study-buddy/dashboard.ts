@@ -10,8 +10,7 @@ import {
 
 import { demoGoals, demoSessions } from "@/lib/study-buddy/demo-data";
 import {
-  createServerSupabaseClient,
-  getStudyBuddyUserId,
+  getAuthenticatedUser,
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
 import type {
@@ -64,7 +63,7 @@ function buildDashboardData({
       durationMinutes: session.duration_minutes,
       completedAtLabel: session.completed_at
         ? format(parseISO(session.completed_at), "dd MMM, HH:mm")
-        : "Belum selesai",
+        : "Not completed",
     }));
 
   const weeklyProgress = week.map((day) => {
@@ -148,6 +147,7 @@ function buildDashboardData({
     profileName,
     todayLabel: format(today, "EEEE, d MMMM yyyy"),
     demoMode,
+    authRequired: false,
     goalStats: {
       total: todayGoals.length,
       completed: todayGoals.filter((goal) => goal.completed).length,
@@ -185,13 +185,25 @@ export async function getDashboardData(): Promise<DashboardData> {
   }
 
   try {
-    const supabase = createServerSupabaseClient();
+    const { supabase, user } = await getAuthenticatedUser();
 
     if (!supabase) {
       throw new Error("Supabase client is unavailable.");
     }
 
-    const userId = getStudyBuddyUserId();
+    if (!user) {
+      return {
+        ...buildDashboardData({
+          goals: [],
+          sessions: [],
+          profileName: "Study Buddy",
+          demoMode: false,
+        }),
+        authRequired: true,
+      };
+    }
+
+    const userId = user.id;
 
     const [{ data: goals }, { data: sessions }, { data: profile }] =
       await Promise.all([
@@ -217,7 +229,12 @@ export async function getDashboardData(): Promise<DashboardData> {
     return buildDashboardData({
       goals: goals ?? [],
       sessions: sessions ?? [],
-      profileName: profile?.full_name ?? "Study Buddy Explorer",
+      profileName:
+        profile?.full_name ??
+        user.user_metadata.full_name ??
+        user.user_metadata.name ??
+        user.email?.split("@")[0] ??
+        "Study Buddy",
       demoMode: false,
     });
   } catch {

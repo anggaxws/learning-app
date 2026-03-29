@@ -3,7 +3,6 @@ import {
   Bell,
   Goal,
   LayoutDashboard,
-  LogOut,
   Search,
   Settings,
   Sparkles,
@@ -13,8 +12,10 @@ import {
 import { format } from "date-fns";
 
 import { addGoal, toggleGoalStatus } from "@/app/actions";
+import { AuthPanel } from "@/components/auth-panel";
 import { FocusTimer } from "@/components/focus-timer";
 import { SubmitButton } from "@/components/submit-button";
+import { SignOutButton } from "@/components/sign-out-button";
 import { getDashboardData } from "@/lib/study-buddy/dashboard";
 
 const shellCard =
@@ -22,6 +23,17 @@ const shellCard =
 
 export default async function FocusPage() {
   const dashboard = await getDashboardData();
+
+  if (dashboard.authRequired) {
+    return (
+      <AuthPanel
+        next="/focus"
+        title="Sign in to start your focus workspace."
+        description="Use your Google account to save timer sessions automatically and keep your daily goals in sync."
+      />
+    );
+  }
+
   const firstName = dashboard.profileName.split(" ")[0] || "Study Buddy";
   const bestDay = [...dashboard.weeklyProgress].sort(
     (a, b) => b.focusMinutes - a.focusMinutes,
@@ -61,7 +73,7 @@ export default async function FocusPage() {
 
           <div className="space-y-1">
             <NavItem href="#" icon={<Settings className="h-4 w-4" />} label="Help" compact />
-            <NavItem href="#" icon={<LogOut className="h-4 w-4" />} label="Logout" compact />
+            <SignOutButton className="mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-full px-4 py-2 text-xs font-semibold text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-800" />
           </div>
         </div>
       </aside>
@@ -244,7 +256,7 @@ export default async function FocusPage() {
                         <p className="mt-1 text-sm text-slate-500">
                           {goal.completed
                             ? `Completed at ${goal.completedAtLabel ?? "today"}`
-                            : `${goal.category} • High Priority`}
+                            : `${goal.category} - High Priority`}
                         </p>
                       </div>
                     </div>
@@ -268,11 +280,7 @@ export default async function FocusPage() {
                               : "border-[#0f7669]/30 bg-white text-[#0f7669]"
                           }`}
                         >
-                          {goal.completed ? (
-                            <span className="text-sm">✓</span>
-                          ) : (
-                            <span className="text-sm">○</span>
-                          )}
+                          <span className="text-sm">{goal.completed ? "✓" : "○"}</span>
                         </button>
                       </form>
                     </div>

@@ -22,6 +22,7 @@ export type DashboardData = {
   profileName: string;
   todayLabel: string;
   demoMode: boolean;
+  authRequired: boolean;
   goalStats: {
     total: number;
     completed: number;
