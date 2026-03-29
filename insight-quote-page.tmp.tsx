@@ -21,7 +21,6 @@ import { AuthPanel } from "@/components/auth-panel";
 import { FocusActivityCard } from "@/components/focus-activity-card";
 import { getDashboardData } from "@/lib/study-buddy/dashboard";
 import { LiveNow } from "@/components/live-now";
-import { MotivationalInsightCard } from "@/components/motivational-insight-card";
 import { SignOutButton } from "@/components/sign-out-button";
 import { SubmitButton } from "@/components/submit-button";
 
@@ -47,6 +46,10 @@ export default async function Home() {
     (sum, day) => sum + day.completedGoals,
     0,
   );
+  const totalFocusMinutes = dashboard.weeklyProgress.reduce(
+    (sum, day) => sum + day.focusMinutes,
+    0,
+  );
   const todayProgress = dashboard.weeklyProgress.at(-1);
   const todayFocusMinutes = todayProgress?.focusMinutes ?? 0;
   const dailyFocusGoal = 120;
@@ -64,15 +67,13 @@ export default async function Home() {
       ? `You are on a ${dashboard.streak.current}-day streak. Keep this rhythm going for steadier learning progress.`
       : "Start with one short session today to build your learning rhythm again.";
   const firstName = dashboard.profileName.split(" ")[0] || "Sinlernix";
-  const now = new Date();
-  const quoteIndex = Math.floor((now.getHours() * 60 + now.getMinutes()) / 5) % 6;
 
   return (
     <main className="min-h-screen bg-[#f4f7f8] text-slate-800">
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-emerald-100 bg-[#f7fbf8] px-4 py-6 md:flex md:flex-col">
         <div className="px-4">
           <h1 className="font-display text-2xl font-bold tracking-tight text-emerald-900">
-            SinlerniX
+            Sinlernix
           </h1>
           <p className="mt-1 text-xs font-bold uppercase tracking-[0.28em] text-emerald-700/70">
             Stay Focused
@@ -403,9 +404,35 @@ export default async function Home() {
             </p>
           </section>
 
-          <MotivationalInsightCard
-            initialQuoteIndex={quoteIndex}
-          />
+          <section className="md:col-span-7 overflow-hidden rounded-[28px] bg-emerald-700 p-8 text-white">
+            <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+              <div className="max-w-2xl">
+                <Sparkles className="h-8 w-8 text-emerald-100" />
+                <h3 className="font-display mt-4 text-3xl font-bold">
+                  Mindful Insight
+                </h3>
+                <p className="mt-3 text-lg font-medium leading-8 text-emerald-50/90">
+                  Small daily consistency creates much stronger long-term learning results.
+                </p>
+                <p className="mt-4 text-sm leading-7 text-emerald-50/75">
+                  You have completed {totalGoalsDone} goals and {totalFocusMinutes} focus minutes
+                  this week. That is a strong foundation to keep your momentum going.
+                </p>
+              </div>
+
+              <div className="w-full max-w-[12rem] rounded-[28px] border border-white/10 bg-white/15 p-5 text-center backdrop-blur">
+                <p className="text-xs font-bold uppercase tracking-[0.28em] text-emerald-50/70">
+                  Current Streak
+                </p>
+                <p className="font-display my-2 text-6xl font-black">
+                  {dashboard.streak.current}
+                </p>
+                <p className="text-xs font-bold uppercase tracking-[0.28em]">
+                  Days
+                </p>
+              </div>
+            </div>
+          </section>
 
           <section className="grid gap-6 md:col-span-5 md:grid-cols-2">
             <MiniMetric
