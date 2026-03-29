@@ -1,9 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Lock, LogIn, Mail } from "lucide-react";
 
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+
+type AuthMode = "sign-in" | "sign-up";
 
 export function CleanMinimalSignIn({
   title,
@@ -14,15 +18,22 @@ export function CleanMinimalSignIn({
   description: string;
   next?: string;
 }) {
+  const router = useRouter();
+  const [mode, setMode] = useState<AuthMode>("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   function validateEmail(value: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
-  function handleEmailSignIn() {
+  async function handleEmailAuth() {
+    setError("");
+    setSuccess("");
+
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
@@ -33,7 +44,51 @@ export function CleanMinimalSignIn({
       return;
     }
 
-    setError("Email sign-in is coming soon. Continue with Google for now.");
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    startTransition(async () => {
+      const supabase = createBrowserSupabaseClient();
+
+      if (mode === "sign-in") {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          setError(signInError.message);
+          return;
+        }
+
+        router.push(next);
+        router.refresh();
+        return;
+      }
+
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
+      }
+
+      if (data.session) {
+        router.push(next);
+        router.refresh();
+        return;
+      }
+
+      setSuccess("Your account has been created. Check your email to confirm your sign up.");
+    });
   }
 
   return (
@@ -74,6 +129,35 @@ export function CleanMinimalSignIn({
               {description}
             </p>
 
+            <div className="mt-6 grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("sign-in");
+                  setError("");
+                  setSuccess("");
+                }}
+                className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  mode === "sign-in" ? "bg-white text-slate-950 shadow-sm" : "text-slate-500"
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("sign-up");
+                  setError("");
+                  setSuccess("");
+                }}
+                className={`rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  mode === "sign-up" ? "bg-white text-slate-950 shadow-sm" : "text-slate-500"
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+
             <div className="mt-8 flex flex-col gap-3">
               <div className="relative">
                 <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -101,23 +185,38 @@ export function CleanMinimalSignIn({
                 />
               </div>
 
-              <div className="flex min-h-6 items-center justify-between gap-4 text-xs">
-                <span className="text-red-500">{error}</span>
-                <button type="button" className="font-medium text-slate-500 hover:underline">
-                  Forgot password?
-                </button>
+              <div className="min-h-11 text-xs">
+                {error ? <p className="text-red-500">{error}</p> : null}
+                {success ? <p className="text-emerald-600">{success}</p> : null}
+                {!error && !success ? (
+                  <p className="text-slate-500">
+                    {mode === "sign-in"
+                      ? "Use your email and password to access your dashboard."
+                      : "Create an account to save your sessions and daily goals."}
+                  </p>
+                ) : null}
               </div>
             </div>
 
             <button
               type="button"
-              onClick={handleEmailSignIn}
-              className="mt-3 w-full rounded-xl bg-gradient-to-b from-slate-700 to-slate-900 py-3 text-sm font-medium text-white shadow transition hover:brightness-105"
+              onClick={handleEmailAuth}
+              disabled={isPending}
+              className="mt-3 w-full rounded-xl bg-gradient-to-b from-slate-700 to-slate-900 py-3 text-sm font-medium text-white shadow transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Continue with email
+              {isPending
+                ? mode === "sign-in"
+                  ? "Signing in..."
+                  : "Creating account..."
+                : mode === "sign-in"
+                  ? "Continue with email"
+                  : "Create account"}
             </button>
 
-            <div className="my-2 flex items-center">
+            <div className="my-4 flex items-center gap-3 text-xs uppercase tracking-[0.22em] text-slate-300">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span>Or</span>
+              <div className="h-px flex-1 bg-slate-200" />
             </div>
 
             <GoogleSignInButton
